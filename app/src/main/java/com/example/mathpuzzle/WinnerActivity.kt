@@ -106,14 +106,6 @@ class WinnerActivity : ComponentActivity() {
                     ) {
                         CardButton(text = "", onClick = {
                             Log.d("Answer Check", "$puzzleLevel")
-
-                            if (isLevelCompleted(puzzleLevel)) {
-                                Toast.makeText(
-                                    applicationContext,
-                                    "You have already completed this level!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
                                 if (puzzleLevel == 75) {
                                     Toast.makeText(
                                         applicationContext,
@@ -125,8 +117,6 @@ class WinnerActivity : ComponentActivity() {
                                     intent.putExtra("Puzzle", puzzleLevel)
                                     startActivity(intent)
                                 }
-                                LevelAsCompleted(puzzleLevel)
-                            }
                             finish()
                         }, buttonImg = R.drawable.continuebtn)
 
@@ -175,15 +165,5 @@ class WinnerActivity : ComponentActivity() {
             )
         }
     }
-
-
-    fun LevelAsCompleted(level: Int) {
-        MainActivity.edit.putBoolean("Level_$level", true).apply()
-    }
-
-    private fun isLevelCompleted(level: Int): Boolean {
-        return MainActivity.sp.getBoolean("Level_$level", false)
-    }
-
 
 }

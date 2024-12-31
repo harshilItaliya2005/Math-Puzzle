@@ -40,6 +40,12 @@ companion object{
         edit = sp.edit()
         edit.putBoolean("level_completed", true).apply()
 
+        for (i in 0 until 75) {
+            if(sp.getString("Level$i","").equals("")){
+                edit.putString("Level$i", "Lock").apply()
+            }
+        }
+
         enableEdgeToEdge()
 
         setContent {

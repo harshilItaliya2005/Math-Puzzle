@@ -329,6 +329,7 @@ class PlayActivity : ComponentActivity() {
                                                 val intent = Intent(applicationContext, WinnerActivity::class.java)
                                                 intent.putExtra("Puzzle", currentLevelIndex+1)
 
+                                                MainActivity.sp.getString("Level", "Completed")
                                                 startActivity(intent)
                                             } else {
                                                 Log.d("Answer Check", "Wrong answer!")

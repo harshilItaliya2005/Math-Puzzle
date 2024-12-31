@@ -42,7 +42,6 @@ class LevelActivity : ComponentActivity() {
 
     @Composable
     fun Design() {
-        val save = MainActivity.sp.getInt("leve", 0)
         Scaffold(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -77,7 +76,6 @@ class LevelActivity : ComponentActivity() {
                                 val intent =
                                     Intent(applicationContext, PlayActivity::class.java)
                                 intent.putExtra("Puzzle", index)
-                                MainActivity.edit.putInt("level", save + 1).apply()
                                 startActivity(intent)
                             }
                         ) {
