@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 
 class LevelActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -41,6 +42,7 @@ class LevelActivity : ComponentActivity() {
 
     @Composable
     fun Design() {
+        val save = MainActivity.sp.getInt("leve", 0)
         Scaffold(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -72,8 +74,10 @@ class LevelActivity : ComponentActivity() {
                                 containerColor = Color(0xFF42A5F5)
                             ),
                             onClick = {
-                                val intent = Intent(applicationContext, PlayActivity::class.java)
-                                intent.putExtra("Puzzle", index + 1)
+                                val intent =
+                                    Intent(applicationContext, PlayActivity::class.java)
+                                intent.putExtra("Puzzle", index)
+                                MainActivity.edit.putInt("level", save + 1).apply()
                                 startActivity(intent)
                             }
                         ) {

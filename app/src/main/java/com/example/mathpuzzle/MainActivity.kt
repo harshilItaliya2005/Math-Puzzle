@@ -1,6 +1,7 @@
 package com.example.mathpuzzle
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -29,12 +30,22 @@ import androidx.compose.ui.unit.dp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 
 class MainActivity : ComponentActivity() {
+companion object{
+     lateinit var sp: SharedPreferences
+     lateinit var edit : SharedPreferences.Editor
+}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sp = getSharedPreferences("Math", MODE_PRIVATE)
+        edit = sp.edit()
+        edit.putBoolean("level_completed", true).apply()
+
         enableEdgeToEdge()
+
         setContent {
             MathPuzzleTheme {
-                val continuePuzzleLevel = intent.getIntExtra("Puzzle", 1)
+
+                val continuePuzzleLevel = sp.getInt("level", 0)
                 Design(continuePuzzleLevel)
             }
         }

@@ -1,6 +1,7 @@
 package com.example.mathpuzzle
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -30,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,16 +43,17 @@ import androidx.compose.ui.unit.sp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 import com.example.mathpuzzle.ui.theme.orange
 
-var inputText = mutableStateOf("")
-var textArr = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
-val currentAnswer = (1..75).toList()
+
+
 
 class PlayActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MathPuzzleTheme {
+
                 Design()
             }
         }
@@ -58,7 +61,11 @@ class PlayActivity : ComponentActivity() {
 
     @Composable
     fun Design() {
-        val currentLevelIndex = intent.getIntExtra("Puzzle", 1)
+        var inputText = remember { mutableStateOf("") }
+        var textArr = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+        val currentAnswer = (1..75).toList()
+
+        val currentLevelIndex = intent.getIntExtra("Puzzle", 0)
         val levelImages = arrayOf(
             R.drawable.level_one,
             R.drawable.level_two,
@@ -137,7 +144,6 @@ class PlayActivity : ComponentActivity() {
             R.drawable.level_seventy_five
         )
 
-
         Scaffold(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -166,17 +172,13 @@ class PlayActivity : ComponentActivity() {
                             modifier = Modifier
                                 .size(50.dp)
                                 .clickable {
-                                    val currentLevel = intent.getIntExtra("Puzzle", 1)
-                                    val nextLevel = if (currentLevel < levelImages.size) {
-                                        currentLevel + 1
-                                    } else {
-                                        1
-                                    }
-                                    val nextIntent =
-                                        Intent(applicationContext, PlayActivity::class.java)
-                                    nextIntent.putExtra("Puzzle", nextLevel)
+
+                                    val nextIntent = Intent(applicationContext, PlayActivity::class.java)
+
+                                    nextIntent.putExtra("Puzzle", currentLevelIndex+1)
                                     startActivity(nextIntent)
                                     inputText.value = ""
+
                                     finish()
                                 })
                         Card(
@@ -190,7 +192,7 @@ class PlayActivity : ComponentActivity() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Puzzle ${intent.getIntExtra("Puzzle", 1 + 1)}",
+                                    text = "Puzzle ${currentLevelIndex+1}",
                                     fontSize = 30.sp,
                                     color = orange,
                                     fontWeight = FontWeight.Bold
@@ -308,18 +310,14 @@ class PlayActivity : ComponentActivity() {
                             ) {
                                 OutlinedButton(
                                     onClick = {
-                                        val saveN = intent.getIntExtra("Puzzle", 1)
-                                        val inputAnswer = inputText.value
-                                        if (inputAnswer.isEmpty()) {
+                                        if (inputText.value.isEmpty()) {
                                             Toast.makeText(
                                                 applicationContext,
                                                 "Please enter an answer!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
-                                            val correctAnswer =
-                                                currentAnswer[currentLevelIndex - 1].toString()
-                                            if (inputAnswer == correctAnswer) {
+                                            if (inputText.value == "${currentAnswer[currentLevelIndex]}") {
                                                 Log.d("Answer Check", "Correct answer!")
                                                 Toast.makeText(
                                                     applicationContext,
@@ -327,11 +325,10 @@ class PlayActivity : ComponentActivity() {
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                                 inputText.value = ""
-                                                val intent = Intent(
-                                                    applicationContext,
-                                                    WinnerActivity::class.java
-                                                )
-                                                intent.putExtra("Puzzle", saveN)
+                                                MainActivity.edit.putInt("level",currentLevelIndex+1).apply()
+                                                val intent = Intent(applicationContext, WinnerActivity::class.java)
+                                                intent.putExtra("Puzzle", currentLevelIndex+1)
+
                                                 startActivity(intent)
                                             } else {
                                                 Log.d("Answer Check", "Wrong answer!")

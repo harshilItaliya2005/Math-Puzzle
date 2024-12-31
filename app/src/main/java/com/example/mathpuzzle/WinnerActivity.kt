@@ -2,6 +2,8 @@ package com.example.mathpuzzle
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,9 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 
+@Suppress("UNCHECKED_CAST")
 class WinnerActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             MathPuzzleTheme {
@@ -100,20 +105,41 @@ class WinnerActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CardButton(text = "", onClick = {
-                            val intent = Intent(applicationContext, PlayActivity::class.java)
-                            intent.putExtra("Puzzle", puzzleLevel + 1)
-                            startActivity(intent)
+                            Log.d("Answer Check", "$puzzleLevel")
+
+                            if (isLevelCompleted(puzzleLevel)) {
+                                Toast.makeText(
+                                    applicationContext,
+                                    "You have already completed this level!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                if (puzzleLevel == 75) {
+                                    Toast.makeText(
+                                        applicationContext,
+                                        "Your All Level Is Completed",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    val intent = Intent(applicationContext, PlayActivity::class.java)
+                                    intent.putExtra("Puzzle", puzzleLevel)
+                                    startActivity(intent)
+                                }
+                                LevelAsCompleted(puzzleLevel)
+                            }
                             finish()
                         }, buttonImg = R.drawable.continuebtn)
+
                         CardButton(text = "LEVEL", onClick = {
                             val mainMenu = Intent(applicationContext, MainActivity::class.java)
-                            mainMenu.putExtra("Puzzle", puzzleLevel + 1)
                             startActivity(mainMenu)
                         }, buttonImg = R.drawable.main_menu)
+
                         CardButton(
                             text = "BUY PRO", onClick = {}, buttonImg = R.drawable.buy_pro_button
                         )
                     }
+
                     Box(
                         modifier = Modifier
                             .weight(.2f)
@@ -149,4 +175,15 @@ class WinnerActivity : ComponentActivity() {
             )
         }
     }
+
+
+    fun LevelAsCompleted(level: Int) {
+        MainActivity.edit.putBoolean("Level_$level", true).apply()
+    }
+
+    private fun isLevelCompleted(level: Int): Boolean {
+        return MainActivity.sp.getBoolean("Level_$level", false)
+    }
+
+
 }
