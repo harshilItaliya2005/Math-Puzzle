@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 
-@Suppress("UNCHECKED_CAST")
 class WinnerActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,22 +105,22 @@ class WinnerActivity : ComponentActivity() {
                     ) {
                         CardButton(text = "", onClick = {
                             Log.d("Answer Check", "$puzzleLevel")
-                                if (puzzleLevel == 75) {
-                                    Toast.makeText(
-                                        applicationContext,
-                                        "Your All Level Is Completed",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    val intent = Intent(applicationContext, PlayActivity::class.java)
-                                    intent.putExtra("Puzzle", puzzleLevel)
-                                    startActivity(intent)
-                                }
+                            if (puzzleLevel == 75) {
+                                Toast.makeText(
+                                    this@WinnerActivity,
+                                    "Your All Level Is Completed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                val intent = Intent(this@WinnerActivity, PlayActivity::class.java)
+                                intent.putExtra("Puzzle", puzzleLevel)
+                                startActivity(intent)
+                            }
                             finish()
                         }, buttonImg = R.drawable.continuebtn)
 
                         CardButton(text = "LEVEL", onClick = {
-                            val mainMenu = Intent(applicationContext, MainActivity::class.java)
+                            val mainMenu = Intent(this@WinnerActivity, MainActivity::class.java)
                             startActivity(mainMenu)
                         }, buttonImg = R.drawable.main_menu)
 
@@ -165,5 +164,4 @@ class WinnerActivity : ComponentActivity() {
             )
         }
     }
-
 }

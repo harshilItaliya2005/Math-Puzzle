@@ -1,7 +1,6 @@
 package com.example.mathpuzzle
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -42,8 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mathpuzzle.ui.theme.MathPuzzleTheme
 import com.example.mathpuzzle.ui.theme.orange
-
-
 
 
 class PlayActivity : ComponentActivity() {
@@ -173,12 +170,18 @@ class PlayActivity : ComponentActivity() {
                                 .size(50.dp)
                                 .clickable {
 
-                                    val nextIntent = Intent(applicationContext, PlayActivity::class.java)
-
-                                    nextIntent.putExtra("Puzzle", currentLevelIndex+1)
+                                    val nextIntent =
+                                        Intent(applicationContext, PlayActivity::class.java)
+                                    nextIntent.putExtra("Puzzle", currentLevelIndex + 1)
                                     startActivity(nextIntent)
                                     inputText.value = ""
-
+                                    Toast
+                                        .makeText(
+                                            applicationContext,
+                                            "Level ${currentLevelIndex + 1} Skipped!!",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                     finish()
                                 })
                         Card(
@@ -192,7 +195,7 @@ class PlayActivity : ComponentActivity() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Puzzle ${currentLevelIndex+1}",
+                                    text = "Puzzle ${currentLevelIndex + 1}",
                                     fontSize = 30.sp,
                                     color = orange,
                                     fontWeight = FontWeight.Bold
@@ -325,11 +328,28 @@ class PlayActivity : ComponentActivity() {
                                                     Toast.LENGTH_SHORT
                                                 ).show()
                                                 inputText.value = ""
-                                                MainActivity.edit.putInt("level",currentLevelIndex+1).apply()
-                                                val intent = Intent(applicationContext, WinnerActivity::class.java)
-                                                intent.putExtra("Puzzle", currentLevelIndex+1)
-
-                                                MainActivity.sp.getString("Level", "Completed")
+                                                MainActivity.edit.putInt(
+                                                    "level",
+                                                    currentLevelIndex + 1
+                                                ).apply()
+                                                MainActivity.edit.putString(
+                                                    "Level$currentLevelIndex",
+                                                    "Completed"
+                                                ).apply()
+                                                Log.d(
+                                                    "Answer Check",
+                                                    "${
+                                                        MainActivity.sp.getString(
+                                                            "Level$currentLevelIndex",
+                                                            "Completed"
+                                                        )
+                                                    }"
+                                                )
+                                                val intent = Intent(
+                                                    applicationContext,
+                                                    WinnerActivity::class.java
+                                                )
+                                                intent.putExtra("Puzzle", currentLevelIndex + 1)
                                                 startActivity(intent)
                                             } else {
                                                 Log.d("Answer Check", "Wrong answer!")

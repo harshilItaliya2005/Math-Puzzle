@@ -2,6 +2,8 @@ package com.example.mathpuzzle
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -33,15 +35,17 @@ class LevelActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val currentPuzzleLevel = intent.getIntExtra("Puzzle", 1)
+        Log.d("LevelActivity", "Current level passed: $currentPuzzleLevel")
         setContent {
             MathPuzzleTheme {
-                Design()
+                Design(currentPuzzleLevel)
             }
         }
     }
 
     @Composable
-    fun Design() {
+    fun Design(currentLevel: Int) {
         Scaffold(modifier = Modifier.fillMaxSize()) {
             Box(
                 modifier = Modifier
@@ -63,6 +67,9 @@ class LevelActivity : ComponentActivity() {
                         .padding(top = 100.dp)
                 ) {
                     items(arr.size) { index ->
+                        val levelNumber = arr[index]
+                        val levelKey = "Level$levelNumber"
+
                         OutlinedCard(
                             modifier = Modifier
                                 .size(100.dp)
@@ -73,10 +80,29 @@ class LevelActivity : ComponentActivity() {
                                 containerColor = Color(0xFF42A5F5)
                             ),
                             onClick = {
-                                val intent =
-                                    Intent(applicationContext, PlayActivity::class.java)
-                                intent.putExtra("Puzzle", index)
-                                startActivity(intent)
+                                val levelStatus = MainActivity.sp.getString(levelKey, "Lock")
+                                Log.d("Answer Check" , "Level $levelNumber clicked. Status: $levelStatus")
+                                if (levelStatus == "Completed" || levelNumber == currentLevel) {
+                                    Log.d(
+                                        "Answer Check",
+                                        "Navigating to PlayActivity for level $levelNumber"
+                                    )
+                                    val playIntent =
+                                        Intent(this@LevelActivity, PlayActivity::class.java)
+                                    playIntent.putExtra("Puzzle", levelNumber)
+                                    startActivity(playIntent)
+                                    finish()
+                                } else {
+                                    Log.d(
+                                        "Answer Check",
+                                        "Level $levelNumber is locked. Cannot play."
+                                    )
+                                    Toast.makeText(
+                                        this@LevelActivity,
+                                        "Level $levelNumber is locked!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         ) {
                             Box(
