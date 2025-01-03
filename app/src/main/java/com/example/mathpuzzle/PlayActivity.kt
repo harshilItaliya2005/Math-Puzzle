@@ -50,7 +50,6 @@ class PlayActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MathPuzzleTheme {
-
                 Design()
             }
         }
@@ -61,8 +60,8 @@ class PlayActivity : ComponentActivity() {
         var inputText = remember { mutableStateOf("") }
         var textArr = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
         val currentAnswer = (1..75).toList()
-
         val currentLevelIndex = intent.getIntExtra("Puzzle", 0)
+
         val levelImages = arrayOf(
             R.drawable.level_one,
             R.drawable.level_two,
@@ -169,19 +168,16 @@ class PlayActivity : ComponentActivity() {
                             modifier = Modifier
                                 .size(50.dp)
                                 .clickable {
+                                    if (MainActivity.sp.getString("Level$currentLevelIndex", "") == "Lock") {
+                                        MainActivity.edit.putString("Level$currentLevelIndex", "Skip").apply()
+                                    }
 
-                                    val nextIntent =
-                                        Intent(applicationContext, PlayActivity::class.java)
+                                    inputText.value = ""
+                                    Toast.makeText(applicationContext, "Level ${currentLevelIndex + 1} Skipped!!", Toast.LENGTH_SHORT).show()
+                                    MainActivity.edit.putInt("level", currentLevelIndex + 1).apply()
+                                    val nextIntent = Intent(applicationContext, PlayActivity::class.java)
                                     nextIntent.putExtra("Puzzle", currentLevelIndex + 1)
                                     startActivity(nextIntent)
-                                    inputText.value = ""
-                                    Toast
-                                        .makeText(
-                                            applicationContext,
-                                            "Level ${currentLevelIndex + 1} Skipped!!",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
                                     finish()
                                 })
                         Card(
@@ -309,57 +305,28 @@ class PlayActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 30.dp)
-                                    .weight(1f), contentAlignment = Alignment.Center
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
                             ) {
                                 OutlinedButton(
                                     onClick = {
                                         if (inputText.value.isEmpty()) {
-                                            Toast.makeText(
-                                                applicationContext,
-                                                "Please enter an answer!",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+                                            Toast.makeText(applicationContext, "Please enter an answer!", Toast.LENGTH_SHORT).show()
                                         } else {
                                             if (inputText.value == "${currentAnswer[currentLevelIndex]}") {
                                                 Log.d("Answer Check", "Correct answer!")
-                                                Toast.makeText(
-                                                    applicationContext,
-                                                    "You Win!!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                Toast.makeText(applicationContext, "You Win!!", Toast.LENGTH_SHORT).show()
                                                 inputText.value = ""
-                                                MainActivity.edit.putInt(
-                                                    "level",
-                                                    currentLevelIndex + 1
-                                                ).apply()
-                                                MainActivity.edit.putString(
-                                                    "Level$currentLevelIndex",
-                                                    "Completed"
-                                                ).apply()
-                                                Log.d(
-                                                    "Answer Check",
-                                                    "${
-                                                        MainActivity.sp.getString(
-                                                            "Level$currentLevelIndex",
-                                                            "Completed"
-                                                        )
-                                                    }"
-                                                )
-                                                val intent = Intent(
-                                                    applicationContext,
-                                                    WinnerActivity::class.java
-                                                )
+                                                MainActivity.edit.putInt("level", currentLevelIndex + 1).apply()
+                                                MainActivity.edit.putString("Level$currentLevelIndex", "Completed").apply()
+                                                Log.d("Answer Check", "${MainActivity.sp.getString("Level$currentLevelIndex", "Completed")}")
+                                                val intent = Intent(applicationContext, WinnerActivity::class.java)
                                                 intent.putExtra("Puzzle", currentLevelIndex + 1)
                                                 startActivity(intent)
                                             } else {
-                                                Log.d("Answer Check", "Wrong answer!")
-                                                Toast.makeText(
-                                                    applicationContext,
-                                                    "You Lose! Try Again!!",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
+                                                Log.d("A    nswer Check", "Wrong answer!")
+                                                Toast.makeText(applicationContext, "You Lose! Try Again!!", Toast.LENGTH_SHORT).show()
                                                 inputText.value = ""
-
                                             }
                                         }
                                     },

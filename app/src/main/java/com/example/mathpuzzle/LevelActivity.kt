@@ -35,11 +35,12 @@ class LevelActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val currentPuzzleLevel = intent.getIntExtra("Puzzle", 1)
-        Log.d("LevelActivity", "Current level passed: $currentPuzzleLevel")
+        val continuePuzzleLevel = MainActivity.Companion.sp.getInt("level", 0)
+
+        Log.d("Answer Check", "Current level passed: $continuePuzzleLevel")
         setContent {
             MathPuzzleTheme {
-                Design(currentPuzzleLevel)
+                Design(continuePuzzleLevel)
             }
         }
     }
@@ -59,61 +60,70 @@ class LevelActivity : ComponentActivity() {
                     contentScale = ContentScale.FillBounds
                 )
 
-                val arr = (1..75).toList()
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 100.dp)
                 ) {
-                    items(arr.size) { index ->
-                        val levelNumber = arr[index]
-                        val levelKey = "Level$levelNumber"
+                    items(75) { index ->
 
-                        OutlinedCard(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .padding(10.dp),
+                        val levelStatus = MainActivity.sp.getString("Level$index", "Lock")
+
+                        OutlinedCard(modifier = Modifier
+                            .size(100.dp)
+                            .padding(10.dp),
                             border = BorderStroke(4.dp, color = Color.White),
                             shape = RoundedCornerShape(20.dp),
                             colors = CardDefaults.elevatedCardColors(
                                 containerColor = Color(0xFF42A5F5)
                             ),
                             onClick = {
-                                val levelStatus = MainActivity.sp.getString(levelKey, "Lock")
-                                Log.d("Answer Check" , "Level $levelNumber clicked. Status: $levelStatus")
-                                if (levelStatus == "Completed" || levelNumber == currentLevel) {
-                                    Log.d(
-                                        "Answer Check",
-                                        "Navigating to PlayActivity for level $levelNumber"
-                                    )
+                                Log.d("Answer Check", "Level ${index + 1} clicked. Status: $levelStatus")
+                                if (levelStatus == "Lock" && currentLevel != index) {
+                                    Log.d("Answer Check", "Level ${index + 1} is locked. Cannot play.")
+                                    Toast.makeText(this@LevelActivity, "Level ${index + 1} is locked!", Toast.LENGTH_SHORT).show()
+                                } else {
                                     val playIntent =
                                         Intent(this@LevelActivity, PlayActivity::class.java)
-                                    playIntent.putExtra("Puzzle", levelNumber)
+                                    playIntent.putExtra("Puzzle", index)
                                     startActivity(playIntent)
                                     finish()
-                                } else {
-                                    Log.d(
-                                        "Answer Check",
-                                        "Level $levelNumber is locked. Cannot play."
-                                    )
-                                    Toast.makeText(
-                                        this@LevelActivity,
-                                        "Level $levelNumber is locked!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
                                 }
-                            }
-                        ) {
+
+                            }) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = (index + 1).toString(),
-                                    fontSize = 20.sp,
-                                    color = Color.White
-                                )
+
+                                if (levelStatus == "Completed") {
+                                    Text(
+                                        text = (index + 1).toString(),
+                                        fontSize = 25.sp,
+                                        color = Color.White
+                                    )
+                                    Image(
+                                        painter = painterResource(R.drawable.right),
+                                        contentDescription = "",
+                                        modifier = Modifier.size(50.dp)
+
+                                    )
+                                } else if (levelStatus == "Skip" || currentLevel == index ) {
+                                    Text(
+                                        text = (index + 1).toString(),
+                                        fontSize = 25.sp,
+                                        color = Color.White
+                                    )
+                                } else {
+
+                                        Image(
+                                            painter = painterResource(R.drawable.lock),
+                                            contentDescription = "",
+                                            modifier = Modifier.size(50.dp)
+                                        )
+
+                                }
                             }
                         }
                     }
